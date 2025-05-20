@@ -29,7 +29,6 @@ const initChart = () => {
 
   // 配置项保持不变...
   chartInstance.setOption({
-    // ...原有配置
     title: {
       text: `性别分布\n\n总数：${total}`,
       left: 'center',

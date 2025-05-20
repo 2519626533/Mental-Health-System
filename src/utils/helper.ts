@@ -23,6 +23,7 @@ export const generateMockData = () => {
   // 生成20条测试记录
   const testRecords = Array.from({ length: 20 }, (_, i) => ({
     id: i + 1,
+    name: '张三',
     studentId: `2023010${i + 10}`,
     gender: i % 2 === 0 ? '男' : '女',
     age: 18 + Math.floor(Math.random() * 5),

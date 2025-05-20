@@ -1,3 +1,4 @@
+import DataManagement from '@/views/Layout/DataManagement.vue'
 import Home from '@/views/Layout/Home.vue'
 
 import LayoutPage from '@/views/Layout/LayoutPage.vue'
@@ -15,6 +16,10 @@ const router = createRouter({
         {
           path: '',
           component: Home,
+        },
+        {
+          path: 'data',
+          component: DataManagement,
         },
       ],
     },
