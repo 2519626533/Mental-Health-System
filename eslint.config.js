@@ -31,5 +31,6 @@ export default antfu({
       singleline: { max: 4 },
       multiline: { max: 1 },
     }],
+    'no-alert': ['off'],
   },
 })

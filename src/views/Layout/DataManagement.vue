@@ -4,7 +4,7 @@ import Pagination from '@/components/admin/Pagination.vue'
 import SearchBar from '@/components/admin/SearchBar.vue'
 import StudentTable from '@/components/admin/StudentTable.vue'
 import { useDataStore } from '@/store/modules/dataStore'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 // 定义类型
 interface FilterParams {
@@ -25,8 +25,7 @@ const pageSize = ref(10)
 
 // 计算当前页数据
 const paginatedStudents = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  return dataStore.filteredStudents.slice(start, start + pageSize.value)
+  return dataStore.paginatedStudents
 })
 
 // 处理分页变化
@@ -34,9 +33,6 @@ const handlePageChange = (page: { currentPage: number, pageSize: number }) => {
   currentPage.value = page.currentPage
   pageSize.value = page.pageSize
 }
-
-// 加载初始数据
-dataStore.loadMockData()
 
 // 处理编辑操作
 const handleEdit = (student: any) => {
@@ -60,6 +56,13 @@ const handleFilter = (filters: FilterParams) => {
     dataStore.setFilters({})
   }
 }
+// 监听分页变化
+watch(
+  () => [dataStore.currentPage, dataStore.pageSize],
+  () => {
+    dataStore.setCurrentPage(dataStore.currentPage)
+  },
+)
 </script>
 
 <template>

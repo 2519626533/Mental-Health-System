@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useDebounce } from '@/utils/hooks'
 import { ref, watch } from 'vue'
+import FileUploader from './FileUploader.vue'
 
 // 定义类型
 interface FilterParams {
-  dateRange?: string[]
+  dateRange?: string[] | null
   [key: string]: any
 }
 
@@ -16,13 +16,12 @@ const emit = defineEmits<{
 
 // 搜索状态
 const searchQuery = ref('')
-const debouncedSearch = useDebounce(searchQuery.value, 300)
 
 // 日期范围
 const dateRange = ref<string[]>([])
 
 // 监听防抖值变化
-watch(() => debouncedSearch.value, (value) => {
+watch(() => searchQuery.value, (value) => {
   emit('search', value)
 })
 
@@ -68,6 +67,8 @@ const resetFilters = () => {
       <el-button class="ml-auto" color="#86F6BB" @click="resetFilters">
         重置
       </el-button>
+
+      <FileUploader class="ml-auto" />
     </div>
   </el-card>
 </template>
