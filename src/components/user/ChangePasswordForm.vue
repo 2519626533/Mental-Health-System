@@ -1,0 +1,88 @@
+<script setup lang="ts">
+import { useUserStore } from '@/store'
+import { ref } from 'vue'
+
+const userStore = useUserStore()
+
+// 表单数据
+const form = ref({
+  oldPassword: '',
+  newPassword: '',
+  confirmPassword: '',
+})
+
+// 验证表单
+const validateForm = () => {
+  if (!form.value.newPassword || !form.value.confirmPassword) {
+    alert('请输入新密码')
+    return false
+  }
+
+  if (form.value.newPassword !== form.value.confirmPassword) {
+    alert('两次输入的密码不一致')
+    return false
+  }
+
+  if (form.value.newPassword.length < 6) {
+    alert('密码至少6位')
+    return false
+  }
+
+  return true
+}
+
+// 提交修改
+const submitForm = async () => {
+  if (!validateForm())
+    return
+
+  try {
+    await userStore.changePassword(form.value.oldPassword, form.value.newPassword)
+    alert('密码修改成功')
+
+    // 重置表单
+    form.value = {
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    }
+  } catch (error: any) {
+    alert(error.message || '密码修改失败')
+  }
+}
+</script>
+
+<template>
+  <el-card class="password-form shadow-md border-0 rounded-2xl">
+    <h3 class="mb-4 text-lg font-bold">修改密码</h3>
+
+    <el-form :model="form" label-width="120px" label-position="left">
+      <!-- 原密码 -->
+      <el-form-item label="原密码">
+        <el-input v-model="form.oldPassword" placeholder="输入原密码" type="password" show-password />
+      </el-form-item>
+
+      <!-- 新密码 -->
+      <el-form-item label="新密码">
+        <el-input v-model="form.newPassword" placeholder="输入新密码" type="password" show-password />
+      </el-form-item>
+
+      <!-- 确认密码 -->
+      <el-form-item label="确认密码">
+        <el-input
+          v-model="form.confirmPassword"
+          placeholder="确认新密码"
+          type="password"
+          show-password
+        />
+      </el-form-item>
+
+      <!-- 提交按钮 -->
+      <el-form-item>
+        <el-button color="#86F6BB" @click="submitForm">
+          修改密码
+        </el-button>
+      </el-form-item>
+    </el-form>
+  </el-card>
+</template>

@@ -1,3 +1,4 @@
+import type { UserInfo } from '@/store'
 import CryptoJS from 'crypto-js'
 
 // 加密
@@ -96,4 +97,32 @@ export const generateMockData = () => {
     scl90Factors,
     testTrends,
   }
+}
+
+// 模拟头像上传
+export const uploadAvatar = (file: File) => {
+  return new Promise<string>((resolve) => {
+    setTimeout(() => {
+      resolve(URL.createObjectURL(file))
+    }, 500)
+  })
+}
+
+// 模拟更新资料
+export const updateProfile = (profile: UserInfo) => {
+  return new Promise<void>((resolve) => {
+    setTimeout(resolve, 500)
+  })
+}
+
+// 模拟修改密码
+export const changePassword = (data: { oldPassword: string, newPassword: string }) => {
+  return new Promise<void>((resolve, reject) => {
+    setTimeout(() => {
+      if (data.newPassword === data.oldPassword) {
+        reject(new Error('新密码不能与原密码相同'))
+      }
+      resolve()
+    }, 500)
+  })
 }

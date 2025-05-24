@@ -19,20 +19,10 @@ const currentStudent = ref()
 // 加载初始数据
 dataStore.loadMockData()
 
-// 分页配置
-const currentPage = ref(1)
-const pageSize = ref(10)
-
 // 计算当前页数据
 const paginatedStudents = computed(() => {
   return dataStore.paginatedStudents
 })
-
-// 处理分页变化
-const handlePageChange = (page: { currentPage: number, pageSize: number }) => {
-  currentPage.value = page.currentPage
-  pageSize.value = page.pageSize
-}
 
 // 处理编辑操作
 const handleEdit = (student: any) => {
@@ -68,10 +58,7 @@ watch(
 <template>
   <div class="data-management p-6 bg-#F9F9F9 min-h-screen">
     <!-- 搜索与筛选 -->
-    <SearchBar
-      @search="dataStore.setSearchQuery"
-      @filter="handleFilter"
-    />
+    <SearchBar @search="dataStore.setSearchQuery" @filter="handleFilter" />
 
     <!-- 数据表格 -->
     <StudentTable
@@ -92,11 +79,10 @@ watch(
     <Pagination
       v-if="dataStore.total > 0"
       :total="dataStore.total"
-      :page-size="pageSize"
-      :current-page="currentPage"
-      @update:current-page="currentPage = $event"
-      @update:page-size="pageSize = $event"
-      @change="handlePageChange"
+      :page-size="dataStore.pageSize"
+      :current-page="dataStore.currentPage"
+      @update:current-page="dataStore.setCurrentPage"
+      @update:page-size="dataStore.setPageSize"
     />
   </div>
 </template>

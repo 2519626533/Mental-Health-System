@@ -10,6 +10,7 @@
       <div class="home-link">
         <router-link to="/">首页</router-link>
         <router-link to="data">数据</router-link>
+        <router-link to="user">个人中心</router-link>
       </div>
     </div>
     <div class="main">

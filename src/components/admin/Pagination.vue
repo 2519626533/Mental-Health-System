@@ -1,3 +1,4 @@
+// Pagination.vue 改进
 <script setup lang="ts">
 import { defineEmits, defineProps, ref, watch } from 'vue'
 
@@ -9,18 +10,18 @@ const props = defineProps<{
   pageSizes?: number[]
 }>()
 
-// 定义事件
+// 定义emit
 const emit = defineEmits<{
   (e: 'update:current-page', page: number): void
   (e: 'update:page-size', size: number): void
   (e: 'change', page: { currentPage: number, pageSize: number }): void
 }>()
 
-// 创建本地响应式状态
+// 本地状态
 const localCurrentPage = ref(props.currentPage)
 const localPageSize = ref(props.pageSize)
 
-// 监听props变化同步本地状态
+// 同步props变化
 watch(() => props.currentPage, (newVal) => {
   localCurrentPage.value = newVal
 })
@@ -44,6 +45,7 @@ const handleSizeChange = (pageSize: number) => {
 }
 </script>
 
+<!-- Pagination.vue 模板改进 -->
 <template>
   <div class="pagination flex justify-center mt-6">
     <el-pagination

@@ -10,9 +10,12 @@ declare module 'vue' {
   export interface GlobalComponents {
     Age: typeof import('./src/components/admin/Age.vue')['default']
     AgeDistribution: typeof import('./src/components/admin/AgeDistribution.vue')['default']
+    AvatarUploader: typeof import('./src/components/user/AvatarUploader.vue')['default']
+    ChangePasswordForm: typeof import('./src/components/user/ChangePasswordForm.vue')['default']
     EcgBackground: typeof import('./src/components/EcgBackground.vue')['default']
     EcgCanvasBg: typeof import('./src/components/EcgCanvasBg.vue')['default']
     EditDrawer: typeof import('./src/components/admin/EditDrawer.vue')['default']
+    EditProfileForm: typeof import('./src/components/user/EditProfileForm.vue')['default']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButto: typeof import('element-plus/es')['ElButto']
     ElButton: typeof import('element-plus/es')['ElButton']
@@ -40,6 +43,7 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTag: typeof import('element-plus/es')['ElTag']
+    ElUpload: typeof import('element-plus/es')['ElUpload']
     FileUploader: typeof import('./src/components/admin/FileUploader.vue')['default']
     GenderChart: typeof import('./src/components/admin/GenderChart.vue')['default']
     Pagination: typeof import('./src/components/admin/Pagination.vue')['default']
@@ -50,6 +54,7 @@ declare module 'vue' {
     StudentOverview: typeof import('./src/components/admin/StudentOverview.vue')['default']
     StudentTable: typeof import('./src/components/admin/StudentTable.vue')['default']
     TestTrendChart: typeof import('./src/components/admin/TestTrendChart.vue')['default']
+    UserInfoCard: typeof import('./src/components/user/UserInfoCard.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']
