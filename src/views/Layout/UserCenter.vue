@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import UserInfoCard from '@/components/user/UserInfoCard.vue';
+import AvatarUploader from '@/components/user/AvatarUploader.vue'
+import ChangePasswordForm from '@/components/user/ChangePasswordForm.vue'
+import EditProfileForm from '@/components/user/EditProfileForm.vue'
+import UserInfoCard from '@/components/user/UserInfoCard.vue'
 import { useUserStore } from '@/store'
 
 // 获取用户信息

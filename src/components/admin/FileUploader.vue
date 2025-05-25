@@ -175,6 +175,7 @@ const uploadFile = () => {
 // 提交解析数据
 const submitData = () => {
   if (parsedData.value.length > 0) {
+    console.log(parsedData.value)
     dataStore.addStudents(parsedData.value)
     dialogVisible.value = false
     alert('数据导入成功')

@@ -7,10 +7,10 @@
       class="header w-full h-8% bg-white shadow-sm
       flex justify-center items-center"
     >
-      <div class="home-link">
-        <router-link to="/">首页</router-link>
-        <router-link to="data">数据</router-link>
-        <router-link to="user">个人中心</router-link>
+      <div class="home-link w-50% flex justify-between">
+        <router-link to="/admin/">首页</router-link>
+        <router-link to="/admin/data">数据</router-link>
+        <router-link to="/admin/user">个人中心</router-link>
       </div>
     </div>
     <div class="main">

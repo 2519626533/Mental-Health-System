@@ -4,8 +4,11 @@ import * as _ from 'lodash'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import { setupRouterGuard } from './router/guard'
 import pinia from './store'
 import 'virtual:uno.css'
+
+// setupRouterGuard(router)
 
 createApp(App)
   .use(router)
