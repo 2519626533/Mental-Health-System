@@ -2,6 +2,8 @@ import DataManagement from '@/views/Layout/DataManagement.vue'
 import Home from '@/views/Layout/Home.vue'
 
 import LayoutPage from '@/views/Layout/LayoutPage.vue'
+import Scl90Page from '@/views/Layout/Scl90Page.vue'
+import StudentHome from '@/views/Layout/StudentHome.vue'
 import UserCenter from '@/views/Layout/UserCenter.vue'
 import LoginPage from '@/views/Login/LoginPage.vue'
 
@@ -38,13 +40,29 @@ const router = createRouter({
     },
     // 普通用户
     {
-      path: '/',
+      path: '/student',
       component: LayoutPage,
       meta: {
         requiresAuth: true,
         role: 'student',
       },
       children: [
+        {
+          path: '',
+          component: StudentHome,
+          meta: {
+            requiresAuth: true,
+            role: 'student',
+          },
+        },
+        {
+          path: 'test',
+          component: Scl90Page,
+          meta: {
+            requiresAuth: true,
+            role: 'student',
+          },
+        },
         {
           path: 'user',
           component: UserCenter,
