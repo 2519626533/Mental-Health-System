@@ -1,9 +1,26 @@
+// types/student.ts
 export interface Student {
-  studentId: string
+  id: number
+  student_id: number
   name: string
-  gender: string
+  gender: number
   age: number
-  testDate: string
-  factors: Record<string, number>
-  totalScore: number
+  test_date: string
+  somatization: number
+  obsession: number
+  interpersonal: number
+  depression: number
+  anxiety: number
+  hostility: number
+  phobia: number
+  paranoia: number
+  psychoticism: number
+  other: number
+}
+
+// 响应类型
+export interface SclRecordsResponse {
+  code: number
+  data: Student[]
+  msg: string
 }

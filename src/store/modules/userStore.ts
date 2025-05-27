@@ -39,6 +39,7 @@ export const useUserStore = defineStore('user', () => {
   // 更新token
   const updateToken = (initToken: string) => {
     token.value = initToken
+    localStorage.setItem('token', token.value)
   }
 
   // 更新头像

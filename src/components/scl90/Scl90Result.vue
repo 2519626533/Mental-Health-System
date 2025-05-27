@@ -17,7 +17,7 @@ const initChart = () => {
   const factors = Object.keys(scl90Store.scores)
   const factorNames = factors.map(factor => ({
     name: factor,
-    max: 4,
+    max: 5, // 评分范围1-5
   }))
 
   chart.setOption({
@@ -81,21 +81,27 @@ watch(() => scl90Store.scores, initChart)
         />
       </el-table>
 
-      <!-- 总分 -->
+      <!-- 统计指标 -->
       <div class="mt-4">
         <h3>总分: {{ scl90Store.totalScore }}</h3>
         <p class="text-gray-500">总均分: {{ scl90Store.averageScore.toFixed(2) }}</p>
+        <p class="text-gray-500">阳性项目数: {{ scl90Store.positiveItems }}</p>
+        <p class="text-gray-500">阳性症状均分: {{ scl90Store.positiveAverage.toFixed(2) }}</p>
       </div>
 
-      <!-- 建议 -->
-      <el-card v-if="scl90Store.averageScore > 2" class="mt-6">
-        <h4 class="font-bold">建议</h4>
-        <p>您的心理健康评分表明存在一定的心理困扰，建议您：</p>
+      <!-- 筛查建议 -->
+      <el-card
+        v-if="scl90Store.totalScore > 160
+          || scl90Store.positiveItems > 43
+          || Object.values(scl90Store.scores).some(score => score > 2)"
+        class="mt-6"
+      >
+        <h4 class="font-bold">筛查建议</h4>
+        <p>您的心理健康评分满足以下任一条件，建议进一步检查：</p>
         <ul class="list-disc pl-5 mt-2">
-          <li>预约专业心理咨询</li>
-          <li>定期进行心理测评</li>
-          <li>关注情绪变化</li>
-          <li>保持规律作息</li>
+          <li>总分>160（当前总分: {{ scl90Store.totalScore }}）</li>
+          <li>阳性项目数>43（当前: {{ scl90Store.positiveItems }}）</li>
+          <li>任一因子分>2（当前最高因子分: {{ Math.max(...Object.values(scl90Store.scores)) }}）</li>
         </ul>
       </el-card>
     </el-card>

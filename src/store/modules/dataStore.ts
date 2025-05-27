@@ -1,5 +1,6 @@
 import type { Student } from '@/types/student'
-import { generateMockData } from '@/utils/helper'
+import { fetchAllSclAPI } from '@/apis'
+// store/dataStore.ts
 import { defineStore } from 'pinia'
 
 interface StudentState {
@@ -30,15 +31,21 @@ export const useDataStore = defineStore('data', {
   }),
 
   actions: {
-    // 加载mock数据
-    loadMockData() {
+    // 加载真实数据
+    async loadMockData() {
       this.loading = true
       try {
-        const mockData = generateMockData()
-        this.students = mockData.testRecords
-        this.total = mockData.testRecords.length
-        this.currentPage = 1
-        this.applyFilters()
+        const res = await fetchAllSclAPI()
+
+        if (res.data.code === 1) {
+          this.students = res.data.data
+          this.total = res.data.data.length
+          this.applyFilters()
+        } else {
+          console.error('数据加载失败:', res.data.msg)
+        }
+      } catch (error) {
+        console.error('请求失败:', error)
       } finally {
         this.loading = false
       }
@@ -53,7 +60,7 @@ export const useDataStore = defineStore('data', {
         const query = this.searchQuery.toLowerCase()
         result = result.filter(
           item => item.name.toLowerCase().includes(query)
-            || item.studentId.includes(query),
+            || item.student_id.toString().includes(query),
         )
       }
 
@@ -61,7 +68,7 @@ export const useDataStore = defineStore('data', {
       if (this.filters.dateRange?.length === 2) {
         const [startDate, endDate] = this.filters.dateRange
         result = result.filter((item) => {
-          const testDate = new Date(item.testDate).getTime()
+          const testDate = new Date(item.test_date).getTime()
           const start = new Date(startDate).getTime()
           const end = new Date(endDate).getTime()
           return testDate >= start && testDate <= end
@@ -73,81 +80,12 @@ export const useDataStore = defineStore('data', {
       this.total = result.length
     },
 
-    // 更新学生数据
-    updateStudent(updatedStudent: Student) {
-      const index = this.students.findIndex(
-        s => s.studentId === updatedStudent.studentId,
-      )
-      if (index !== -1) {
-        this.students[index] = updatedStudent
-        this.applyFilters()
-      }
-    },
-
-    // 删除学生
-    deleteStudent(studentId: string) {
-      this.students = this.students.filter(
-        s => s.studentId !== studentId,
-      )
-      this.applyFilters()
-    },
-
-    // 设置搜索查询
-    setSearchQuery(query: string) {
-      this.searchQuery = query
-      this.currentPage = 1
-      this.applyFilters()
-    },
-
     // 设置筛选条件
     setFilters(filters: { dateRange: string[] }) {
       this.filters = {
         dateRange: filters.dateRange || [],
       }
       this.currentPage = 1
-      this.applyFilters()
-    },
-
-    // 设置当前页码
-    setCurrentPage(page: number) {
-      this.currentPage = page
-      this.applyFilters()
-    },
-
-    // 设置每页数量
-    setPageSize(size: number) {
-      this.pageSize = size
-      this.currentPage = 1
-      this.applyFilters()
-    },
-
-    // 过滤学生
-    filterStudent(start: number, end: number) {
-      this.filteredStudents = this.students.slice(start, end)
-    },
-
-    // 添加学生数据
-    addStudents(students: Student[]) {
-      this.students.push(...students.map(student => ({
-        ...student,
-        testDate: student.testDate || new Date().toISOString().split('T')[0],
-      })))
-      this.currentPage = 1
-      this.applyFilters()
-    },
-
-    // 批量更新学生数据
-    updateStudents(students: Student[]) {
-      students.forEach((updatedStudent) => {
-        const index = this.students.findIndex(
-          s => s.studentId === updatedStudent.studentId,
-        )
-        if (index !== -1) {
-          this.students[index] = updatedStudent
-        } else {
-          this.students.push(updatedStudent)
-        }
-      })
       this.applyFilters()
     },
   },

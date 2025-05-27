@@ -8,7 +8,34 @@ const { data, loading } = defineProps<{
 }>()
 const emit = defineEmits(['edit', 'delete'])
 
-// 根据分数颜色变化
+// 计算总分
+const calculateTotalScore = (row: Student) => {
+  const factors = [
+    row.somatization,
+    row.obsession,
+    row.interpersonal,
+    row.depression,
+    row.anxiety,
+    row.hostility,
+    row.phobia,
+    row.paranoia,
+    row.psychoticism,
+    row.other,
+  ]
+  return factors.reduce((sum, score) => sum + score, 0).toFixed(2)
+}
+
+// 格式化日期
+const formatDate = (dateStr: string) => {
+  return new Date(dateStr).toLocaleDateString()
+}
+
+// 性别转换
+const formatGender = (gender: number) => {
+  return gender === 0 ? '女' : '男'
+}
+
+// 颜色映射
 const scoreColor = (score: number) => {
   if (score > 40)
     return '#ff4444' // 红色
@@ -24,45 +51,60 @@ const scoreColor = (score: number) => {
       v-loading="loading"
       :data="data"
       style="width: 100%"
-      row-key="studentId"
-      :default-expand-all="false"
+      row-key="id"
+      :default-sort="{ prop: 'id' }"
     >
       <!-- 学生ID -->
-      <el-table-column prop="studentId" label="学生ID">
+      <el-table-column label="学生ID" prop="id" sortable>
         <template #default="{ row }">
-          <el-tag type="info" size="small">{{ row.studentId }}</el-tag>
+          <el-tag type="info" size="small">{{ row.id }}</el-tag>
         </template>
       </el-table-column>
 
       <!-- 姓名 -->
-      <el-table-column prop="name" label="姓名">
+      <el-table-column prop="name" label="姓名" sortable>
         <template #default="{ row }">
           <span class="font-medium">{{ row.name }}</span>
         </template>
       </el-table-column>
 
+      <!-- 性别 -->
+      <el-table-column label="性别" sortable>
+        <template #default="{ row }">
+          <el-tag :type="row.gender === 0 ? 'success' : 'warning'" size="small">
+            {{ formatGender(row.gender) }}
+          </el-tag>
+        </template>
+      </el-table-column>
+
+      <!-- 年龄 -->
+      <el-table-column label="年龄" sortable>
+        <template #default="{ row }">
+          <span>{{ row.age }}</span>
+        </template>
+      </el-table-column>
+
       <!-- 测试时间 -->
-      <el-table-column prop="testDate" label="测试时间">
+      <el-table-column label="测试时间" sortable>
         <template #default="{ row }">
           <el-tag type="success" size="small">
-            {{ new Date(row.testDate).toLocaleDateString() }}
+            {{ formatDate(row.test_date) }}
           </el-tag>
         </template>
       </el-table-column>
 
       <!-- SCL-90总分 -->
-      <el-table-column label="总分">
+      <el-table-column label="总分" sortable>
         <template #default="{ row }">
-          <!-- 进度条显示 -->
+          <!-- 计算总分 -->
           <el-progress
-            :percentage="row.totalScore"
+            :percentage="calculateTotalScore(row)"
             :stroke-width="15"
-            :color="scoreColor(row.totalScore)"
+            :color="scoreColor(calculateTotalScore(row))"
             :text-inside="true"
           >
-            <span class="ml-2 text-xs">{{ row.totalScore }}</span>
+            <span class="ml-2 text-xs">{{ calculateTotalScore(row) }}</span>
           </el-progress>
-          <!-- 显示具体分数 -->
         </template>
       </el-table-column>
 
@@ -70,10 +112,10 @@ const scoreColor = (score: number) => {
       <el-table-column label="操作" fixed="right">
         <template #default="{ row }">
           <div class="flex gap-2">
-            <el-button size="small" type="primary" @click="emit('edit', row)">
+            <el-button size="small" color="#86F6BB" @click="emit('edit', row)">
               编辑
             </el-button>
-            <el-button size="small" type="danger" @click="emit('delete', row.studentId)">
+            <el-button size="small" color="#ff4444" @click="emit('delete', row.student_id)">
               删除
             </el-button>
           </div>

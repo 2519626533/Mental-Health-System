@@ -1,40 +1,54 @@
 <script setup lang="ts">
-import type { UserInfo } from '@/types/user'
-import { userLoginAPI, userRegisterAPI } from '@/apis/user'
+import type { IUserInfo } from '@/types/user'
+import { userLoginAPI, userRegisterAPI } from '@/apis'
 import EcgBackground from '@/components/EcgBackground.vue'
 import { useUserStore } from '@/store'
 import { decrypt, encrypt } from '@/utils/helper'
 import { Lock, User } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 // 页面状态
 const isLogin = ref(true)
 
-const userInfo = ref<UserInfo>({
+const userInfo = ref<IUserInfo>({
   account: '',
   password: '',
+  role_id: '2',
 })
 // 记住我
 const rememberMe = ref<boolean>(false)
 // 锁定登录框
-const isLocked = ref<boolean>(false)
+const isLocked = ref<boolean>(true)
 // 获取Store
 const userStore = useUserStore()
 
+const router = useRouter()
 // 登录事件
 const handleLogIn = async () => {
   const res = await userLoginAPI(userInfo.value)
-  const loginSuc = res.data.data !== null
+  const loginSuc = res.data.code === 1
+
   if (loginSuc) {
-    userStore.updateInfo(res.data)
-    userStore.updateToken(res.data.token)
-  }
-  if (loginSuc && rememberMe.value) {
-    const encryptedAccount = encrypt(userInfo.value.account, 'USER_ACCOUNT')
-    const encryptedPassword = encrypt(userInfo.value.password, 'USER_PASSWORD')
-    document.cookie = `rememberMe=true; max-age=${7 * 24 * 3600}`
-    document.cookie = `account=${encryptedAccount}; max-age=${7 * 24 * 3600}`
-    document.cookie = `password=${encryptedPassword}; max-age=${7 * 24 * 3600}`
+    // 1. 更新store
+    const role = res.data.data.role === '1' ? 'admin' : 'student'
+    userStore.updateInfo({
+      ...res.data.data,
+      role, // 确保role字段为'admin'/'student'
+    })
+
+    // 2. 跳转逻辑
+    const redirect = role === 'admin' ? '/admin' : '/student'
+    router.push(redirect)
+
+    // 3. 保存token
+    userStore.updateToken(res.data.data.authentication)
+  } else {
+    ElMessage({
+      type: 'error',
+      message: res.data.msg,
+    })
   }
 }
 
@@ -109,10 +123,12 @@ onMounted(() => {
               class="account w-2/3 h-12 mt-5 rounded-15px text-15px shadow-md focus:"
               placeholder="请输入您的账号"
               :prefix-icon="User"
+              style="width: 80%;"
             ></el-input>
             <!-- 密码 -->
             <el-input
               v-model="userInfo.password"
+              style="width: 80%;"
               class="password w-2/3 h-12 mt-8 rounded-15px text-15px shadow-md"
               placeholder="请输入您的密码"
               :prefix-icon="Lock"
@@ -156,6 +172,7 @@ onMounted(() => {
             <!-- 账号 -->
             <el-input
               v-model="userInfo.account"
+              style="width: 80%;"
               class="account w-2/3 h-12 mt-5 rounded-15px text-15px shadow-md focus:"
               placeholder="请输入您的账号"
               :prefix-icon="User"
@@ -163,14 +180,19 @@ onMounted(() => {
             <!-- 密码 -->
             <el-input
               v-model="userInfo.password"
+              style="width: 80%;"
               class="password w-2/3 h-12 mt-8 rounded-15px text-15px shadow-md"
               placeholder="请输入您的密码"
               :prefix-icon="Lock"
               type="password"
               @keyup.enter="handleRegister"
             ></el-input>
+            <el-radio-group v-model="userInfo.role_id" class="mt-2">
+              <el-radio value="1">管理员</el-radio>
+              <el-radio value="2">用户</el-radio>
+            </el-radio-group>
             <!-- 注册按钮 -->
-            <div class="button w-1/3 h-15 mt-16 mb-9">
+            <div class="button w-1/3 h-15 mt-14 mb-9">
               <el-button
                 class="w-full"
                 color="#2FD2FE"
@@ -245,7 +267,7 @@ onMounted(() => {
     opacity: 1;
   }
   100% {
-    transform: translateY(-100%);
+    transform: translateY(0%);
     opacity: 0;
   }
 }
@@ -254,8 +276,6 @@ onMounted(() => {
 }
 .animate-text-scroll {
   animation: textScroll 15s linear infinite;
-  /* 添加渐变遮罩 */
-  mask-image: linear-gradient(to bottom, transparent 0%, white 15%, white 85%, transparent 100%);
 }
 .login-container:hover .locking {
   transform: translateY(20px);

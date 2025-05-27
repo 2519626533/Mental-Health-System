@@ -26,10 +26,12 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://free.frpee.com:10781',
+        target: 'http://121.43.101.224:8080',
         changeOrigin: true,
+        secure: false,
         rewrite: path => path.replace(/^\/api/, ''),
       },
     },
+    cors: true,
   },
 })

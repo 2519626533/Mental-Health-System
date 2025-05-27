@@ -7,8 +7,9 @@ import router from './router'
 import { setupRouterGuard } from './router/guard'
 import pinia from './store'
 import 'virtual:uno.css'
+import 'element-plus/dist/index.css'
 
-// setupRouterGuard(router)
+setupRouterGuard(router)
 
 createApp(App)
   .use(router)
