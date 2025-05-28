@@ -1,4 +1,3 @@
-// Pagination.vue 改进
 <script setup lang="ts">
 import { defineEmits, defineProps, ref, watch } from 'vue'
 
@@ -34,7 +33,7 @@ watch(() => props.pageSize, (newVal) => {
 const handleCurrentChange = (currentPage: number) => {
   localCurrentPage.value = currentPage
   emit('update:current-page', currentPage)
-  emit('change', { currentPage, pageSize: localPageSize.value })
+  emit('change', { currentPage, pageSize: props.pageSize })
 }
 
 // 处理每页数量变化
@@ -45,7 +44,6 @@ const handleSizeChange = (pageSize: number) => {
 }
 </script>
 
-<!-- Pagination.vue 模板改进 -->
 <template>
   <div class="pagination flex justify-center mt-6">
     <el-pagination

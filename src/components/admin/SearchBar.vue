@@ -50,6 +50,7 @@ const resetFilters = () => {
         clearable
         class="w-60"
         prefix-icon="Search"
+        @input="emit('search', searchQuery)"
       />
 
       <!-- 日期筛选 -->

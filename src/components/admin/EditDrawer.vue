@@ -21,7 +21,15 @@ const localStudent = ref<Student | null>(null)
 
 // 初始化学生数据
 watch(() => props.student, (newVal) => {
-  localStudent.value = newVal ? { ...newVal } : null
+  if (newVal) {
+    localStudent.value = {
+      ...newVal,
+      gender: newVal.gender === 0 ? 0 : 1,
+      test_date: newVal.test_date || new Date().toISOString().split('T')[0],
+    }
+  } else {
+    localStudent.value = null
+  }
 }, { immediate: true })
 
 // 同步visible状态
@@ -42,9 +50,36 @@ const handleSubmit = () => {
     emit('update:visible', false)
   }
 }
+
+// 字段中文映射
+const factorLabels = {
+  somatization: '躯体化',
+  obsession: '强迫症状',
+  interpersonal: '人际关系敏感',
+  depression: '抑郁',
+  anxiety: '焦虑',
+  hostility: '敌对',
+  phobia: '恐怖',
+  paranoia: '偏执',
+  psychoticism: '精神病性',
+  other: '其他(睡眠/饮食)',
+}
+
+// 有效因子字段
+const validFactors = [
+  'somatization',
+  'obsession',
+  'interpersonal',
+  'depression',
+  'anxiety',
+  'hostility',
+  'phobia',
+  'paranoia',
+  'psychoticism',
+  'other',
+]
 </script>
 
-<!-- 在模板中使用本地状态 -->
 <template>
   <el-drawer
     v-model="localVisible"
@@ -54,41 +89,34 @@ const handleSubmit = () => {
     @close="handleClose"
   >
     <el-form v-if="localStudent" :model="localStudent" label-width="120px">
-      <!-- 表单字段 -->
-      <!-- 学生ID -->
+      <!-- 固定字段 -->
       <el-form-item label="学生ID">
-        <el-input v-model="localStudent.studentId" disabled />
+        <el-input v-model="localStudent.student_id" disabled />
       </el-form-item>
 
-      <!-- 姓名 -->
       <el-form-item label="姓名">
         <el-input v-model="localStudent.name" />
       </el-form-item>
 
-      <!-- 性别 -->
       <el-form-item label="性别">
         <el-select v-model="localStudent.gender" class="w-full">
-          <el-option label="男" value="男" />
-          <el-option label="女" value="女" />
+          <el-option label="女" :value="0" />
+          <el-option label="男" :value="1" />
         </el-select>
       </el-form-item>
 
-      <!-- 年龄 -->
       <el-form-item label="年龄">
         <el-input-number v-model="localStudent.age" :min="16" :max="30" />
       </el-form-item>
 
-      <!-- 测试日期 -->
       <el-form-item label="测试日期">
-        <el-date-picker v-model="localStudent.testDate" type="date" placeholder="选择日期" />
+        <el-date-picker v-model="localStudent.test_date" type="date" placeholder="选择日期" />
       </el-form-item>
 
-      <!-- SCL-90因子评分 -->
-      <div v-for="(value, key) in localStudent.factors" :key="key">
-        <el-form-item :label="key">
-          <el-slider v-model="localStudent.factors[key]" :min="1" :max="5" />
-        </el-form-item>
-      </div>
+      <!-- 因子字段 -->
+      <el-form-item v-for="factor in validFactors" :key="factor" :label="factorLabels[factor]">
+        <el-slider v-model="localStudent[factor as keyof Student]" :min="1" :max="5" :step="0.1" />
+      </el-form-item>
 
       <!-- 提交按钮 -->
       <div class="pt-4 flex justify-end gap-4">

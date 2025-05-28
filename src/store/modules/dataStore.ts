@@ -14,6 +14,7 @@ interface StudentState {
   currentPage: number
   pageSize: number
   total: number
+  // 移除paginatedStudents（getter不应作为state）
 }
 
 export const useDataStore = defineStore('data', {
@@ -40,6 +41,7 @@ export const useDataStore = defineStore('data', {
         if (res.data.code === 1) {
           this.students = res.data.data
           this.total = res.data.data.length
+          this.currentPage = 1
           this.applyFilters()
         } else {
           console.error('数据加载失败:', res.data.msg)
@@ -59,8 +61,8 @@ export const useDataStore = defineStore('data', {
       if (this.searchQuery) {
         const query = this.searchQuery.toLowerCase()
         result = result.filter(
-          item => item.name.toLowerCase().includes(query)
-            || item.student_id.toString().includes(query),
+          item => item.name?.toLowerCase().includes(query)
+            || (item.id?.toString().includes(query) ?? false),
         )
       }
 
@@ -75,9 +77,22 @@ export const useDataStore = defineStore('data', {
         })
       }
 
-      // 应用分页
+      // 更新分页数据
       this.filteredStudents = result
       this.total = result.length
+      this.paginate()
+    },
+
+    // 分页处理（不再直接修改getter）
+    paginate() {
+      // getter会自动处理分页，无需手动设置
+    },
+
+    // 更新搜索查询
+    setSearchQuery(query: string) {
+      this.searchQuery = query
+      this.currentPage = 1
+      this.applyFilters()
     },
 
     // 设置筛选条件
@@ -88,8 +103,22 @@ export const useDataStore = defineStore('data', {
       this.currentPage = 1
       this.applyFilters()
     },
+
+    // 设置当前页码
+    setCurrentPage(page: number) {
+      this.currentPage = page
+      this.paginate() // 调用空的paginate方法
+    },
+
+    // 设置每页数量
+    setPageSize(size: number) {
+      this.pageSize = size
+      this.currentPage = 1
+      this.paginate() // 调用空的paginate方法
+    },
   },
   getters: {
+    // 移除paginatedStudents getter
     paginatedStudents: (state) => {
       const start = (state.currentPage - 1) * state.pageSize
       return state.filteredStudents.slice(start, start + state.pageSize)

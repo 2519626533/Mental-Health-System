@@ -8,31 +8,31 @@ const { data, loading } = defineProps<{
 }>()
 const emit = defineEmits(['edit', 'delete'])
 
-// 计算总分
+// 计算总分（添加空值处理）
 const calculateTotalScore = (row: Student) => {
   const factors = [
-    row.somatization,
-    row.obsession,
-    row.interpersonal,
-    row.depression,
-    row.anxiety,
-    row.hostility,
-    row.phobia,
-    row.paranoia,
-    row.psychoticism,
-    row.other,
+    row.somatization ?? 0,
+    row.obsession ?? 0,
+    row.interpersonal ?? 0,
+    row.depression ?? 0,
+    row.anxiety ?? 0,
+    row.hostility ?? 0,
+    row.phobia ?? 0,
+    row.paranoia ?? 0,
+    row.psychoticism ?? 0,
+    row.other ?? 0,
   ]
   return factors.reduce((sum, score) => sum + score, 0).toFixed(2)
 }
 
-// 格式化日期
+// 格式化日期（添加空值处理）
 const formatDate = (dateStr: string) => {
-  return new Date(dateStr).toLocaleDateString()
+  return dateStr ? new Date(dateStr).toLocaleDateString() : '未知'
 }
 
-// 性别转换
+// 性别转换（添加空值处理）
 const formatGender = (gender: number) => {
-  return gender === 0 ? '女' : '男'
+  return gender === 0 ? '女' : gender === 1 ? '男' : '未知'
 }
 
 // 颜色映射
@@ -100,7 +100,7 @@ const scoreColor = (score: number) => {
           <el-progress
             :percentage="calculateTotalScore(row)"
             :stroke-width="15"
-            :color="scoreColor(calculateTotalScore(row))"
+            :color="scoreColor(parseFloat(calculateTotalScore(row)))"
             :text-inside="true"
           >
             <span class="ml-2 text-xs">{{ calculateTotalScore(row) }}</span>
