@@ -28,11 +28,13 @@ export const checkFileAPI = (fileId: string) =>
     params: { file_id: fileId },
   })
 
-// 5. 上传文件
-export const uploadFileAPI = (file: FormData) =>
-  request.post<FileUploadResponse>('/common/upload', file, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+// 修改上传接口以支持进度回调
+export const uploadFileAPI
+  = (file: FormData, onUploadProgress?: (progressEvent: ProgressEvent) => void) =>
+    request.post('/common/upload', file, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress,
+    })
 
 // 6. 解析excel
 export const parseFileAPI = (fileId: string) =>

@@ -1,5 +1,6 @@
 import type { Student } from '@/types/student'
-import { fetchAllSclAPI } from '@/apis'
+import { deleteSclRecordAPI, fetchAllSclAPI, updateSclRecordAPI } from '@/apis'
+import { ElMessage } from 'element-plus'
 // store/dataStore.ts
 import { defineStore } from 'pinia'
 
@@ -115,6 +116,63 @@ export const useDataStore = defineStore('data', {
       this.pageSize = size
       this.currentPage = 1
       this.paginate() // 调用空的paginate方法
+    },
+    // 删除学生
+    async deleteStudent(id: number) {
+      try {
+        const res = await deleteSclRecordAPI(id)
+
+        if (res.data.code === 1) {
+          this.students = this.students.filter(s => s.id !== id)
+          this.applyFilters()
+          ElMessage({
+            type: 'success',
+            message: '删除成功',
+          })
+        } else {
+          ElMessage({
+            type: 'warning',
+            message: res.data.msg || '删除失败',
+          })
+        }
+      } catch (error) {
+        console.error('删除异常:', error)
+        ElMessage({
+          type: 'error',
+          message: '删除异常，请重试',
+        })
+      }
+    },
+    // 更新学生数据
+    async updateStudent(student: Student) {
+      try {
+        const res = await updateSclRecordAPI(student)
+
+        if (res.data.code === 1) {
+          const index = this.students.findIndex(s => s.id === student.id)
+          if (index !== -1) {
+            this.students[index] = student
+          } else {
+            this.students.push(student)
+          }
+          this.applyFilters()
+          ElMessage({
+            type: 'success',
+            message: '更新成功',
+          })
+        } else {
+          ElMessage({
+            type: 'warning',
+            message: res.data.msg || '更新失败',
+          })
+        }
+      } catch (error) {
+        console.error('更新异常:', error)
+        ElMessage({
+          type: 'error',
+          message: '更新失败',
+        })
+      }
     },
   },
   getters: {

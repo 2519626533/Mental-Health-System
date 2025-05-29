@@ -115,7 +115,7 @@ const scoreColor = (score: number) => {
             <el-button size="small" color="#86F6BB" @click="emit('edit', row)">
               编辑
             </el-button>
-            <el-button size="small" color="#ff4444" @click="emit('delete', row.student_id)">
+            <el-button size="small" color="#ff4444" @click="emit('delete', row.id)">
               删除
             </el-button>
           </div>

@@ -31,7 +31,7 @@ const handleEdit = (student: any) => {
 }
 
 // 处理删除操作
-const handleDelete = (id: string) => {
+const handleDelete = (id: number) => {
   dataStore.deleteStudent(id)
 }
 
