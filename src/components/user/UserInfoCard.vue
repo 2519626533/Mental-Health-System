@@ -1,7 +1,19 @@
 <script setup lang="ts">
-import { useUserStore } from '@/store/modules/userStore'
+import { useUserStore } from '@/store'
+import { ElMessage } from 'element-plus'
+import { onMounted, ref } from 'vue'
 
 const userStore = useUserStore()
+const loading = ref(true)
+
+// 页面加载时刷新用户信息
+onMounted(async () => {
+  try {
+    await userStore.loadUserInfo()
+  } finally {
+    loading.value = false
+  }
+})
 </script>
 
 <template>
@@ -12,7 +24,7 @@ const userStore = useUserStore()
         :src="userStore.userInfo.avatar"
         alt="用户头像"
         class="w-32 h-32 rounded-full mb-4 object-cover"
-      >
+      />
 
       <!-- 基本信息 -->
       <h2 class="text-xl font-bold mb-2">{{ userStore.userInfo.name }}</h2>

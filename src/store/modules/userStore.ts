@@ -1,69 +1,96 @@
-import { changePassword, updateProfile, uploadAvatar } from '@/utils/helper'
+import type { IUserInfo } from '@/types/user'
+import {
+  fetchUserInfoAPI,
+  logoutAPI,
+  updateAvatarAPI,
+  updateBaseInfoAPI,
+  updatePasswordAPI,
+} from '@/apis'
 // store/userStore.ts
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-// 扩展UserInfo接口
-export interface UserInfo {
-  account: string
-  password: string
-  name?: string
-  email?: string
-  avatar?: string
-  role?: 'admin' | 'student'
-  isAuthenticated?: boolean
-}
-
 export const useUserStore = defineStore('user', () => {
-  // 基础信息
-  const userInfo = ref<UserInfo>({
-    account: '',
-    password: '',
-    name: '',
-    email: '',
-    avatar: 'https://via.placeholder.com/150 ',
-    role: 'student',
-    isAuthenticated: false,
-  })
+  // 从localStorage恢复状态
+  const storedInfo = localStorage.getItem('userInfo')
+  const storedToken = localStorage.getItem('token')
 
-  const token = ref<string>('')
+  // 基础信息
+  const userInfo = ref<IUserInfo>(storedInfo
+    ? JSON.parse(storedInfo)
+    : {
+        account: '',
+        password: '',
+        name: '',
+        email: '',
+        avatar: 'https://via.placeholder.com/150',
+        role: 'student',
+        isAuthenticated: false,
+      },
+  )
+  const token = ref<string>(storedToken || '')
 
   // 更新基础信息
-  const updateInfo = (initInfo: Partial<UserInfo>) => {
-    userInfo.value = {
+  const updateInfo = (initInfo: Partial<IUserInfo>) => {
+    const updated = {
       ...userInfo.value,
       ...initInfo,
+      isAuthenticated: true,
     }
+    userInfo.value = updated
+    localStorage.setItem('userInfo', JSON.stringify(updated))
   }
-
   // 更新token
   const updateToken = (initToken: string) => {
     token.value = initToken
     localStorage.setItem('token', token.value)
   }
 
+  // 获取用户信息
+  const loadUserInfo = async () => {
+    try {
+      const res = await fetchUserInfoAPI()
+      if (res.data.code === 1) {
+        const role = res.data.data.role === '1' ? 'admin' : 'student'
+        updateInfo({
+          ...res.data.data,
+          role,
+        })
+      }
+    } catch (error) {
+      console.error('获取用户信息失败:', error)
+    }
+  }
+
   // 更新头像
-  const updateAvatar = async (file: File) => {
-    // 验证文件
-    if (!['image/jpeg', 'image/png'].includes(file.type)) {
-      throw new Error('只能上传JPG/PNG文件')
+  const updateAvatar = async (avatarUrl: string) => {
+    // 调用真实API
+    const res = await updateAvatarAPI(avatarUrl)
+
+    if (res.data.code === 1) {
+      // 更新store
+      updateInfo({ avatar: avatarUrl })
+      return avatarUrl
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      throw new Error('文件大小不能超过2MB')
+    throw new Error(res.data.msg || '头像更新失败')
+  }
+
+  // 修改信息
+  const updateProfile = async (name: string, email: string) => {
+    // 调用真实API
+    const res = await updateBaseInfoAPI({ username: name, email })
+
+    if (res.data.code === 1) {
+      // 更新store
+      updateInfo({
+        name,
+        email,
+      })
+      return true
     }
 
-    // 上传并获取URL
-    const avatarUrl = await uploadAvatar(file)
-
-    // 更新状态
-    updateInfo({
-      avatar: avatarUrl,
-      name: userInfo.value.name,
-      email: userInfo.value.email,
-    })
-
-    return avatarUrl
+    throw new Error(res.data.msg || '信息更新失败')
   }
 
   // 修改密码
@@ -76,16 +103,42 @@ export const useUserStore = defineStore('user', () => {
       throw new Error('密码至少6位')
     }
 
-    // 调用API
-    await updateProfile({
-      account: userInfo.value.account,
-      password: newPassword,
-      name: userInfo.value.name,
-      email: userInfo.value.email,
+    // 调用真实API
+    const res = await updatePasswordAPI({
+      old_password: oldPassword,
+      new_password: newPassword,
+      confirm_password: newPassword,
     })
 
-    // 更新状态
-    updateInfo({ password: newPassword })
+    if (res.data.code === 1) {
+      // 更新store
+      updateInfo({ password: newPassword })
+      return true
+    }
+
+    throw new Error(res.data.msg || '密码修改失败')
+  }
+
+  // 退出登录
+  const logout = async () => {
+    try {
+      // 调用真实API
+      await logoutAPI()
+    } finally {
+      // 清除本地状态
+      userInfo.value = {
+        account: '',
+        password: '',
+        name: '',
+        email: '',
+        avatar: '',
+        role: 'student',
+        isAuthenticated: false,
+      }
+      token.value = ''
+      localStorage.removeItem('userInfo')
+      localStorage.removeItem('token')
+    }
   }
 
   return {
@@ -94,6 +147,9 @@ export const useUserStore = defineStore('user', () => {
     updateInfo,
     updateToken,
     updateAvatar,
+    updateProfile,
     changePassword,
+    logout,
+    loadUserInfo,
   }
 })

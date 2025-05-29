@@ -1,6 +1,10 @@
+import { createSclRecordAPI } from '@/apis'
 import { generateScl90Questions } from '@/utils/helper'
+import { dayjs, ElMessage } from 'element-plus'
 // store/scl90Store.ts 修复版
-import { defineStore } from 'pinia'
+import { defineStore, storeToRefs } from 'pinia'
+import { toRefs } from 'vue'
+import { useUserStore } from './userStore'
 
 export const useScl90Store = defineStore('scl90', {
   state: () => ({
@@ -47,7 +51,7 @@ export const useScl90Store = defineStore('scl90', {
     },
 
     // 计算得分（修正版）
-    calculateScores() {
+    async calculateScores() {
       // 1. 计算总分（直接累加原始分）
       this.totalScore = Object.values(this.answers).reduce((sum, score) => sum + score, 0)
 
@@ -112,6 +116,46 @@ export const useScl90Store = defineStore('scl90', {
 
       // 7. 更新得分
       this.scores = factorScores
+      const userStore = useUserStore()
+
+      const { userInfo } = storeToRefs(userStore)
+
+      const dataToUpload = {
+        student_id: userInfo.value.studentId,
+        name: userInfo.value.name,
+        gender: 0,
+        age: 18,
+        test_date: dayjs().format('YYYY-MM-DD'),
+        somatization: this.scores.躯体化,
+        obsession: this.scores.强迫症状,
+        interpersonal: this.scores.人际关系敏感,
+        depression: this.scores.抑郁,
+        anxiety: this.scores.焦虑,
+        hostility: this.scores.敌对,
+        phobia: this.scores.恐怖,
+        paranoia: this.scores.偏执,
+        psychoticism: this.scores.精神病性,
+        other: this.scores.其他,
+        // totalScore: this.totalScore,
+        // averageScore: this.averageScore,
+        // positiveItems: this.positiveItems,
+        // negativeItems: this.negativeItems,
+        // positiveAverage: this.positiveAverage,
+      }
+
+      try {
+        // 8. 调用后端API
+        const res = await createSclRecordAPI(dataToUpload)
+
+        if (res.data.code === 1) {
+          ElMessage.success('测评结果已保存')
+        } else {
+          ElMessage.error(res.data.msg || '保存失败')
+        }
+      } catch (error: any) {
+        ElMessage.error('保存失败，请检查网络连接')
+        console.error('上传SCL记录失败:', error)
+      }
     },
 
     // 重置测评

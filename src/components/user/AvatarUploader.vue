@@ -1,28 +1,27 @@
 <script setup lang="ts">
+import { uploadFileAPI } from '@/apis'
 import { useUserStore } from '@/store'
-import { uploadAvatar } from '@/utils/helper'
-import { computed, ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import { ref } from 'vue'
 
 const userStore = useUserStore()
 const uploading = ref(false)
 
-// 初始化头像（使用计算属性）
-const avatarUrl = computed(() => {
-  return userStore.userInfo.avatar || 'https://via.placeholder.com/150 '
-})
+// 初始化头像
+const avatarUrl = ref(userStore.userInfo.avatar || 'https://via.placeholder.com/150')
 
 // 文件验证
-const beforeUpload = (file: File) => {
+const beforeUpload = (file: File): boolean => {
   const isValidType = ['image/jpeg', 'image/png'].includes(file.type)
   const isValidSize = file.size / 1024 / 1024 < 2
 
   if (!isValidType) {
-    alert('只能上传JPG/PNG文件！')
+    ElMessage.error('只能上传JPG/PNG文件！')
     return false
   }
 
   if (!isValidSize) {
-    alert('文件大小不能超过2MB！')
+    ElMessage.error('文件大小不能超过2MB！')
     return false
   }
 
@@ -32,16 +31,23 @@ const beforeUpload = (file: File) => {
 // 处理上传
 const handleUpload = async (file: File) => {
   uploading.value = true
-
   try {
-    // 上传头像
-    await uploadAvatar(file)
+    // 1. 上传文件
+    const formData = new FormData()
+    formData.append('file', file)
 
-    // 创建预览URL
-    const newAvatarUrl = URL.createObjectURL(file)
+    const res = await uploadFileAPI(formData)
 
-    // 更新store
-    userStore.updateAvatar(newAvatarUrl)
+    if (res.data.code === 1) {
+      // 2. 更新头像
+      const avatarUrl = res.data.data.file_path
+      await userStore.updateAvatar(avatarUrl)
+      ElMessage.success('头像更新成功')
+    } else {
+      throw new Error(res.data.msg || '文件上传失败')
+    }
+  } catch (error: any) {
+    ElMessage.error(error.message || '头像更新失败')
   } finally {
     uploading.value = false
   }
@@ -52,7 +58,7 @@ const handleUpload = async (file: File) => {
   <el-card class="avatar-card shadow-md border-0 rounded-2xl">
     <div class="flex items-center gap-4">
       <!-- 头像预览 -->
-      <img :src="avatarUrl" alt="用户头像" class="w-16 h-16 rounded-full object-cover">
+      <img :src="avatarUrl" alt="用户头像" class="w-16 h-16 rounded-full object-cover" />
 
       <!-- 上传组件 -->
       <el-upload
@@ -63,7 +69,7 @@ const handleUpload = async (file: File) => {
         :loading="uploading"
         class="ml-auto"
       >
-        <el-button color="#86F6BB" size="small">
+        <el-button color="#86F6BB" size="small" :loading="uploading">
           {{ uploading ? '上传中...' : '修改头像' }}
         </el-button>
       </el-upload>

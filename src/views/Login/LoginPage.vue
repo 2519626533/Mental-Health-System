@@ -34,6 +34,7 @@ const handleLogIn = async () => {
     // 1. 更新store
     const role = res.data.data.role === '1' ? 'admin' : 'student'
     userStore.updateInfo({
+      password: userInfo.value.password,
       ...res.data.data,
       role, // 确保role字段为'admin'/'student'
     })

@@ -55,11 +55,11 @@ userStore.userInfo = {
 </script>
 
 <template>
-  <div class="student-home p-6 bg-#F9F9F9 min-h-screen">
+  <div class="student-home p-6 bg-#F9F9F9">
     <!-- 轮播图 -->
     <MentalHealthCarousel />
 
-    <el-row :gutter="20" class="mt-6">
+    <el-row :gutter="40" class="mt-6">
       <el-col :span="12">
         <!-- 测评图表 -->
         <Scl90HistoryChart />

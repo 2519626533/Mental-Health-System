@@ -42,7 +42,7 @@ export const parseFileAPI = (fileId: string) =>
     params: { file_id: fileId },
   })
 
-// 7. 修改头像
+// 修改头像API
 export const updateAvatarAPI = (avatarUrl: string) =>
   request.post('/avatar', { avatar: avatarUrl })
 

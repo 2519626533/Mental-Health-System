@@ -1,4 +1,5 @@
 import ElementPlus from 'element-plus'
+// 导入Element-Plus及其样式
 import zhCN from 'element-plus/es/locale/lang/zh-cn'
 import * as _ from 'lodash'
 import { createApp } from 'vue'

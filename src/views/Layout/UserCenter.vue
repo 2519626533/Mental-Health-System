@@ -4,10 +4,14 @@ import ChangePasswordForm from '@/components/user/ChangePasswordForm.vue'
 import EditProfileForm from '@/components/user/EditProfileForm.vue'
 import UserInfoCard from '@/components/user/UserInfoCard.vue'
 import { useUserStore } from '@/store'
-
-// 获取用户信息
+import { onMounted } from 'vue'
 
 const userStore = useUserStore()
+
+// 页面加载时获取用户信息
+onMounted(async () => {
+  await userStore.loadUserInfo()
+})
 </script>
 
 <template>
@@ -17,7 +21,6 @@ const userStore = useUserStore()
       <el-col :span="8">
         <UserInfoCard />
       </el-col>
-
       <!-- 可编辑信息 -->
       <el-col :span="16">
         <div class="edit-section space-y-6">

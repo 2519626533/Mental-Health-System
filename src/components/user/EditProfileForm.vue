@@ -1,27 +1,29 @@
 <script setup lang="ts">
 import { useUserStore } from '@/store'
-import { updateProfile } from '@/utils/helper'
-import { computed, ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import { ref } from 'vue'
 
 const userStore = useUserStore()
-const form = ref({
-  name: computed(() => userStore.userInfo.name || ''),
-  email: computed(() => userStore.userInfo.email || ''),
-})
 const submitting = ref(false)
 
+// 表单数据
+const form = ref({
+  name: userStore.userInfo.name || '',
+  email: userStore.userInfo.email || '',
+})
+
 // 表单验证
-const validateForm = () => {
+const validateForm = (): boolean => {
   // 邮箱验证
   const emailRegex = /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/
   if (form.value.email && !emailRegex.test(form.value.email)) {
-    alert('请输入有效的邮箱地址')
+    ElMessage.error('请输入有效的邮箱地址')
     return false
   }
 
   // 名称验证
   if (!form.value.name?.trim()) {
-    alert('用户名不能为空')
+    ElMessage.error('用户名不能为空')
     return false
   }
 
@@ -35,23 +37,11 @@ const submitForm = async () => {
 
   submitting.value = true
   try {
-    // 调用API
-    await updateProfile({
-      account: userStore.userInfo.account,
-      password: userStore.userInfo.password,
-      name: form.value.name,
-      email: form.value.email,
-    })
-
-    // 更新store
-    userStore.updateInfo({
-      name: form.value.name,
-      email: form.value.email,
-    })
-
-    alert('更新成功')
+    // 调用真实API
+    await userStore.updateProfile(form.value.name, form.value.email)
+    ElMessage.success('更新成功')
   } catch (error: any) {
-    alert(`更新失败: ${error.message}`)
+    ElMessage.error(error.message || '更新失败')
   } finally {
     submitting.value = false
   }
@@ -61,7 +51,6 @@ const submitForm = async () => {
 <template>
   <el-card class="profile-form shadow-md border-0 rounded-2xl">
     <h3 class="mb-4 text-lg font-bold">修改个人信息</h3>
-
     <el-form :model="form" label-width="100px" label-position="left">
       <!-- 用户名称 -->
       <el-form-item label="用户名称">
