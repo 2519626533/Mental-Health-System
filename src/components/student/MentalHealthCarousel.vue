@@ -12,6 +12,10 @@ const startAutoPlay = () => {
   }, 5000)
 }
 
+const hanldeClick = (link: string) => {
+  window.open(link)
+}
+
 onMounted(() => {
   studentStore.fetchMockData()
   startAutoPlay()
@@ -24,10 +28,10 @@ onMounted(() => {
       v-for="(item, index) in studentStore.carouselItems"
       :key="index"
       class="cursor-pointer"
-      @click="window.open(item.link, '_blank')"
+      @click="() => hanldeClick(item.link)"
     >
       <div class="carousel-item flex justify-center items-center p-4">
-        <img :src="item.imageUrl" :alt="item.title" class="max-h-full max-w-full">
+        <img :src="item.imageUrl" :alt="item.title" class="max-h-full max-w-full bg-black">
       </div>
     </el-carousel-item>
   </el-carousel>

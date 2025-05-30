@@ -24,7 +24,7 @@ const factorMap = {
 }
 
 // 初始化图表
-const initChart = (factors: string[], dates: string[], scores: number[][]) => {
+const initChart = (factors: string[], testIds: string[], scores: number[][]) => {
   if (!chartDom.value)
     return
 
@@ -38,8 +38,14 @@ const initChart = (factors: string[], dates: string[], scores: number[][]) => {
 
   // 验证数据
   const validFactors = factors.filter(f => factorMap[f])
-  const validDates = dates.length > 0 ? dates : ['无数据']
-  const validScores = scores.map(s => s.length > 0 ? s : [0])
+  const validTestIds = testIds.length > 0 ? testIds : ['无数据']
+  const validScores = validFactors.map((factor, i) => ({
+    name: factorMap[factor],
+    type: 'line',
+    data: scores[i].length > 0 ? scores[i] : [0],
+    smooth: true,
+    itemStyle: { color: ['#86F6BB', '#2FD2FE'][i % 2] },
+  }))
 
   // 配置项
   chartInstance.value.setOption({
@@ -53,7 +59,7 @@ const initChart = (factors: string[], dates: string[], scores: number[][]) => {
     },
     xAxis: {
       type: 'category',
-      data: validDates,
+      data: validTestIds,
       axisLabel: { rotate: 45 },
     },
     yAxis: {
@@ -61,19 +67,7 @@ const initChart = (factors: string[], dates: string[], scores: number[][]) => {
       min: 1,
       max: 5,
     },
-    series: validFactors.map((factor, i) => ({
-      name: factorMap[factor],
-      type: 'line', // 确保类型为line
-      data: validScores[i],
-      smooth: true,
-      itemStyle: { color: ['#86F6BB', '#2FD2FE'][i % 2] },
-    })),
-    grid: {
-      left: 60,
-      right: 30,
-      bottom: 50,
-      top: 60,
-    },
+    series: validScores,
   })
 }
 
@@ -85,12 +79,10 @@ const loadHistoryData = async () => {
     if (res.data.code === 1) {
       // 解析数据
       const factors = Object.keys(factorMap)
-
-      // 确保数据存在
       const validData = res.data.data || []
 
-      // 获取测试日期
-      const dates = validData.map((_, i) => `测试${i + 1}`)
+      // 获取测试ID
+      const testIds = validData.sort((a, b) => a.id - b.id).map(record => `${record.id}`)
 
       // 获取各因子分
       const scores = factors.map(factor =>
@@ -104,7 +96,7 @@ const loadHistoryData = async () => {
       )
 
       // 初始化图表
-      initChart(factors, dates, scores)
+      initChart(factors, testIds, scores)
     } else {
       ElMessage.error(res.data.msg || '数据加载失败')
     }

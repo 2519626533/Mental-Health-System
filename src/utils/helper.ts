@@ -134,35 +134,40 @@ export const generateLink = () => {
     carouselItems: [
       {
         title: '中国心理学会官方指南',
-        imageUrl: 'https://example.com/mental-health-1.jpg ', // 替换为实际CDN地址
-        link: 'https://www.cpsbeijing.org.cn ',
+        imageUrl: 'https://www.cpsbeijing.org/cms/resource/100000/images/indexgai_25.png', // 替换为实际CDN地址
+        link: 'https://www.cpsbeijing.org/',
       },
       {
         title: '国家心理健康网',
-        imageUrl: 'https://example.com/mental-health-2.jpg ', // 替换为实际CDN地址
-        link: 'https://www.nmpf.org.cn ',
+        imageUrl: 'https://www.cnnmh.cn/image.php?type=banner&id=1&v=d72577868c5a13bf7738f42ce50b1051', // 替换为实际CDN地址
+        link: 'https://www.cnnmh.cn/',
       },
       {
         title: '心理学空间',
-        imageUrl: 'https://example.com/mental-health-3.jpg ', // 替换为实际CDN地址
-        link: 'http://www.psychspace.com',
+        imageUrl: 'https://psychspace.com/images/logo2020.gif', // 替换为实际CDN地址
+        link: 'https://psychspace.com/',
       },
     ],
     additionalResources: [
       {
         title: '高校心理援助平台',
         description: '提供免费在线心理咨询',
-        link: 'https://www.psyhelp.cn ',
+        link: 'https://xinli.univs.cn/',
       },
       {
         title: '简单心理',
         description: '专业心理测评与咨询服务',
-        link: 'https://www.jdxinli.cn ',
+        link: 'https://www.jiandanxinli.com/',
       },
       {
         title: '壹心理',
         description: '心理学书籍与课程',
-        link: 'https://www.xinli001.com ',
+        link: 'https://www.xinli001.com/',
+      },
+      {
+        title: 'kuakua网',
+        description: '在线心理资料与网站',
+        link: 'https://kuakua.app/',
       },
     ],
   }

@@ -2,6 +2,7 @@
 import AvatarUploader from '@/components/user/AvatarUploader.vue'
 import ChangePasswordForm from '@/components/user/ChangePasswordForm.vue'
 import EditProfileForm from '@/components/user/EditProfileForm.vue'
+import LogouButton from '@/components/user/LogouButton.vue'
 import UserInfoCard from '@/components/user/UserInfoCard.vue'
 import { useUserStore } from '@/store'
 import { onMounted } from 'vue'
@@ -20,6 +21,7 @@ onMounted(async () => {
       <!-- 用户信息 -->
       <el-col :span="8">
         <UserInfoCard />
+        <LogouButton class="ml-20px" style="margin: 10px 120px 0;"/>
       </el-col>
       <!-- 可编辑信息 -->
       <el-col :span="16">
